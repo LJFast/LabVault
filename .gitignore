@@ -1,0 +1,51 @@
+# ============================================================
+# LabVault repository — what NOT to commit
+# ============================================================
+#
+# This repo holds STRUCTURAL artifacts only:
+#   - templates, schemas, dashboards, registry, README
+#
+# It must NEVER hold real lab data. Real entries live in a
+# separate Obsidian vault outside this repo.
+#
+# These rules are defensive — designed to catch accidents.
+# ============================================================
+
+# Block any actual lab/imaging/report data folders if accidentally
+# created in this repo. The structural artifact uses subfolders like
+# v1/, v2/, docs/ — never Labs/, Imaging/, Reports/ at the repo root.
+/Labs/
+/Imaging/
+/Reports/
+**/Labs/
+**/Imaging/
+**/Reports/
+
+# Block any markdown file that looks like a dated draw note
+# (YYYY-MM-DD-*.md in any subfolder of v*/)
+v*/Labs/**/*.md
+v*/Imaging/**/*.md
+v*/Reports/**/*.md
+
+# Allow the example draw note ONLY if it's named with the
+# explicit "example" prefix (so accidents are loud)
+!**/example_*.md
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.obsidian/workspace*
+.obsidian/cache
+*.swp
+*~
+
+# Python venvs (in case you add scripts later)
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Anything explicitly marked private
+*PRIVATE*
+*private*
+*.private.*
