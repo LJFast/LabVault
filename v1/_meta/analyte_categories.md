@@ -8,7 +8,23 @@ categories:
 
   - id: acid_base
     label: "Acid-base & blood gas"
-    analytes: [bicarbonate, ph, pco2, po2, base_excess]
+    analytes:
+      - bicarbonate
+      - ph
+      - pco2
+      - po2
+      - base_excess
+      - ph_venous
+      - bicarbonate_actual_venous
+      - base_excess_venous
+      - pco2_venous
+      - po2_venous
+      - anion_gap_venous
+      - lactate_whole_blood_venous
+      - glucose_whole_blood_venous
+      - sodium_whole_blood_venous
+      - potassium_whole_blood_venous
+      - chloride_whole_blood_venous
 
   - id: bone_mineral
     label: "Bone-mineral axis"
@@ -71,7 +87,7 @@ categories:
 
   - id: transplant_viral
     label: "Transplant — viral PCRs"
-    analytes: [ebv_pcr, cmv_pcr, bk_pcr_blood, bk_pcr_urine]
+    analytes: [ebv_pcr, cmv_pcr, bk_pcr_blood, bk_pcr_urine, jcpyv_dna_urine, respiratory_panel_pcr]
 
   - id: tumor_markers
     label: "Tumor markers"

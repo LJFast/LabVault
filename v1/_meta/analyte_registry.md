@@ -32,10 +32,22 @@ Canonical names, units, and aliases. Use the canonical name in YAML frontmatter 
 
 | Canonical | Unit | Aliases | Notes |
 |---|---|---|---|
-| `ph` | (unitless) | pH | Venous vs. arterial differs |
-| `pco2` | kPa | pCO2 | Switzerland uses kPa; US uses mmHg (×7.5) |
-| `po2` | kPa | pO2 | |
-| `base_excess` | mmol/L | BE, ABE | |
+| `ph` | (unitless) | pH | Generic; venous unless specified |
+| `ph_venous` | (unitless) | pH venös | Venous BGA; USB ref 7.320–7.430 |
+| `pco2` | kPa | pCO2 | Generic |
+| `pco2_venous` | kPa | pCO2 venös | Venous BGA; USB ref 4.90–6.70 kPa |
+| `po2` | kPa | pO2 | Arterial unless specified |
+| `po2_venous` | kPa | pO2 venös | Venous; USB ref 4.40–5.50 kPa. NOT comparable to arterial pO2 |
+| `bicarbonate` | mmol/L | HCO3, Bikarbonat, Standardbicarbonat | Serum/plasma. SI =SI conventions |
+| `bicarbonate_actual_venous` | mmol/L | Aktuelles Bicarbonat venös | Venous BGA; USB ref 21.0–28.0 mmol/L |
+| `base_excess` | mmol/L | BE, ABE | Generic |
+| `base_excess_venous` | mmol/L | Base Excess venös | Venous BGA; USB ref −2 to +3 mmol/L |
+| `anion_gap_venous` | mmol/L | Anionenlücke venös | Calculated; USB ref 8.0–16.0 |
+| `lactate_whole_blood_venous` | mmol/L | Lactat Vollblut venös | POC; USB ref 0.5–2.2 |
+| `glucose_whole_blood_venous` | mmol/L | Glucose Vollblut venös | POC whole blood; distinct from serum glucose |
+| `sodium_whole_blood_venous` | mmol/L | Natrium Vollblut venös | POC BGA; distinct from serum sodium |
+| `potassium_whole_blood_venous` | mmol/L | Kalium Vollblut venös | POC BGA; distinct from serum potassium |
+| `chloride_whole_blood_venous` | mmol/L | Chlorid Vollblut venös | POC BGA; distinct from serum chloride |
 
 ## Hematology
 
@@ -89,10 +101,12 @@ Canonical names, units, and aliases. Use the canonical name in YAML frontmatter 
 | `ciclosporin_trough` | µg/L | CsA, Sandimmun, C0 | |
 | `mycophenolate_auc` | mg·h/L | MPA AUC | |
 | `everolimus_trough` | µg/L | Certican | |
-| `ebv_pcr` | copies/mL | EBV-DNA, EBV viral load | Lab-specific; store `assay_lab` |
-| `cmv_pcr` | IU/mL | CMV-DNA | International units now standard |
-| `bk_pcr_blood` | copies/mL | BKV blood | |
-| `bk_pcr_urine` | copies/mL | BKV urine | |
+| `ebv_pcr` | copies/mL | EBV-DNA, EBV viral load, ebv_dna_quantitative | Lab-specific; store `assay_lab`. USB reports in GEq/mL |
+| `cmv_pcr` | IU/mL | CMV-DNA, cmv_dna_quantitative | International units now standard. USB reports in IU/mL |
+| `bk_pcr_blood` | copies/mL | BKV blood, BKPyV blood | |
+| `bk_pcr_urine` | copies/mL | BKV urine, BKPyV quan. (Urin), bkpyv_dna_urine | USB reports in GEq/mL; detection limit typically 1000 |
+| `jcpyv_dna_urine` | GEq/mL | JCPyV quan. (Urin) | USB detection limit 1000 GEq/mL |
+| `respiratory_panel_pcr` | qualitative | Respiratorische Panel PCR | 20-pathogen multiplex, nasopharyngeal swab. Store as "all negative" or list positive targets |
 
 ## Liver
 
