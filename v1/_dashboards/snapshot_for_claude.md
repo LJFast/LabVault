@@ -22,56 +22,102 @@ Edit the parameters at the top of the dataviewjs block below to control:
 const monthsBack = 6;
 const analyteFilter = null;       // e.g., ["creatinine", "egfr", "tacrolimus_trough"] or null for all
 const includeContext = true;
+// =====================
 
-// === Build the snapshot ===
+// ── Load category config ──
+const configPage = dv.page("_meta/analyte_categories");
+if (!configPage || !configPage.categories) {
+  dv.paragraph("⚠️ Could not load category config from _meta/analyte_categories.md.");
+} else {
+
+const analyteToCategory = new Map();
+const categories = [];
+configPage.categories.forEach((cat, catIdx) => {
+  categories.push({ id: cat.id, label: cat.label, idx: catIdx, analytes: cat.analytes ?? [] });
+  (cat.analytes ?? []).forEach((a, aIdx) => {
+    analyteToCategory.set(a, { id: cat.id, label: cat.label, catIdx, aIdx });
+  });
+});
+const OTHER = { id: "other", label: "Other (uncategorised)", catIdx: 9999, aIdx: 9999 };
+
+// ── Collect results in window ──
 const cutoff = new Date();
 cutoff.setMonth(cutoff.getMonth() - monthsBack);
 
 const pages = dv.pages('"Labs"')
   .where(p => p.type === "lab_draw" && p.results && p.draw_date)
-  .where(p => {
-    const d = new Date(String(p.draw_date));
-    return d >= cutoff;
-  })
-  .sort(p => String(p.draw_date), "asc");
+  .where(p => new Date(String(p.draw_date)) >= cutoff);
 
-// Collect all results into rows
-const rows = [];
+// Map: analyte → array of {date, value, unit, range, formula}
+const series = new Map();
 for (const p of pages) {
+  const dateStr = String(p.draw_date).slice(0, 10);
   for (const r of p.results) {
     if (analyteFilter && !analyteFilter.includes(r.analyte)) continue;
     if (r.value == null) continue;
-    const rangeStr = (r.range && (r.range[0] != null || r.range[1] != null))
-      ? `${r.range[0] ?? ""}–${r.range[1] ?? ""}`
-      : "";
-    rows.push({
-      date: String(p.draw_date).slice(0, 10),
-      analyte: r.analyte,
+    if (!series.has(r.analyte)) series.set(r.analyte, []);
+    series.get(r.analyte).push({
+      date: dateStr,
       value: r.value,
       unit: r.unit ?? "",
-      range: rangeStr,
+      range: r.range ?? null,
       formula: r.formula ?? ""
     });
   }
 }
 
-// Build markdown
+// Sort each series by date asc
+for (const arr of series.values()) {
+  arr.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+// ── Group analytes into categories ──
+const grouped = new Map();
+for (const [analyte, points] of series.entries()) {
+  const cat = analyteToCategory.get(analyte) ?? OTHER;
+  if (!grouped.has(cat.id)) {
+    grouped.set(cat.id, { label: cat.label, catIdx: cat.catIdx, analytes: [] });
+  }
+  grouped.get(cat.id).analytes.push({ analyte, points, aIdx: cat.aIdx ?? 9999 });
+}
+for (const grp of grouped.values()) {
+  grp.analytes.sort((a, b) => a.aIdx - b.aIdx);
+}
+const sortedGroups = [...grouped.values()].sort((a, b) => a.catIdx - b.catIdx);
+
+// ── Build markdown ──
 let md = "```\n";
 md += `# Lab snapshot — last ${monthsBack} months (generated ${dv.date("today").toFormat("yyyy-MM-dd")})\n\n`;
 
-if (rows.length === 0) {
+if (sortedGroups.length === 0) {
   md += "No results in selected window.\n";
 } else {
-  md += "| Date | Analyte | Value | Unit | Reference range | Notes |\n";
-  md += "|------|---------|-------|------|-----------------|-------|\n";
-  for (const r of rows) {
-    md += `| ${r.date} | ${r.analyte} | ${r.value} | ${r.unit} | ${r.range} | ${r.formula} |\n`;
+  for (const grp of sortedGroups) {
+    md += `## ${grp.label}\n\n`;
+    for (const a of grp.analytes) {
+      // Use the unit and range from the most recent point as the canonical for the analyte
+      const last = a.points[a.points.length - 1];
+      const unit = last.unit ? ` (${last.unit})` : "";
+      let rangeStr = "";
+      if (last.range && (last.range[0] != null || last.range[1] != null)) {
+        const lo = last.range[0];
+        const hi = last.range[1];
+        if (lo == null)      rangeStr = ` [ref: ≤${hi}]`;
+        else if (hi == null) rangeStr = ` [ref: ≥${lo}]`;
+        else                 rangeStr = ` [ref: ${lo}–${hi}]`;
+      }
+      const formula = last.formula ? ` {${last.formula}}` : "";
+      md += `**${a.analyte}**${unit}${rangeStr}${formula}\n`;
+      for (const p of a.points) {
+        md += `  - ${p.date}: ${p.value}\n`;
+      }
+      md += `\n`;
+    }
   }
 }
 
 if (includeContext) {
-  md += `\n---\n`;
-  md += `## Clinical context (edit before pasting if needed)\n\n`;
+  md += `---\n## Clinical context (edit before pasting if needed)\n\n`;
   md += `- Age / sex: \n`;
   md += `- Underlying condition: \n`;
   md += `- Current relevant medications: \n`;
@@ -82,7 +128,11 @@ if (includeContext) {
 md += "```\n";
 
 dv.paragraph(md);
+
+}  // close else
 ```
+
+> **Format note:** The snapshot now groups analytes by clinical category, with each analyte's time-series shown as a small list. This gives an LLM clear context for reasoning ("here's renal function over time, here's bone-mineral over time") rather than a flat table that mixes axes. Unit and reference range are shown once per analyte (taken from the most recent point), reducing redundancy. If you want the old flat table format back, that's a one-block change — let me know.
 
 ## How to use
 

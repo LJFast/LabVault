@@ -7,6 +7,8 @@ purpose: analyte_registry
 
 Canonical names, units, and aliases. Use the canonical name in YAML frontmatter of lab draw notes. The aliases column is for your reference when transcribing from reports written in German, French, or with non-standard abbreviations.
 
+> **Clinical grouping** for dashboards is defined separately in `analyte_categories.md`. The headings below are organisational only — they do not control dashboard ordering.
+
 ## Renal & electrolytes
 
 | Canonical | Unit (SI) | Aliases | Notes |
@@ -14,12 +16,14 @@ Canonical names, units, and aliases. Use the canonical name in YAML frontmatter 
 | `creatinine` | µmol/L | Crea, Kreatinin, Créatinine | Multiply by 0.0113 to get mg/dL |
 | `egfr` | mL/min/1.73m² | GFR estimated, eGFR-CKD-EPI | Always store `formula` field |
 | `urea` | mmol/L | BUN (US, mg/dL), Harnstoff | BUN mg/dL = urea mmol/L × 2.8 |
+| `uric_acid` | µmol/L | Harnsäure | Treatment target for gout: <360, severe gout: <300 |
 | `cystatin_c` | mg/L | Cys-C | Alternative GFR marker |
 | `sodium` | mmol/L | Na, Natrium | |
 | `potassium` | mmol/L | K, Kalium | Hemolysis falsely raises K |
 | `chloride` | mmol/L | Cl, Chlorid | |
 | `bicarbonate` | mmol/L | HCO3, Bikarbonat | Often labeled "Standardbicarbonat" on BGA |
 | `calcium_total` | mmol/L | Ca, Kalzium | Albumin-correction may be needed |
+| `calcium_albumin_corrected` | mmol/L | Ca corr, Calcium Albumin korrigiert | Corrected to alb=40 g/L |
 | `calcium_ionized` | mmol/L | Ca²⁺, ionized Ca | More accurate in low-albumin states |
 | `phosphate` | mmol/L | PO4, Phosphat, P | |
 | `magnesium` | mmol/L | Mg, Magnesium | |
@@ -81,6 +85,7 @@ Canonical names, units, and aliases. Use the canonical name in YAML frontmatter 
 | Canonical | Unit | Aliases | Notes |
 |---|---|---|---|
 | `tacrolimus_trough` | µg/L | Tac, Prograf, FK506, C0 | µg/L = ng/mL numerically. Always store `time_post_dose` (h) |
+| `tacrolimus_post_dose` | µg/L | Tac post-dose, Tac peak, Tac random | NOT a trough. Drawn after dose; not comparable to trough series |
 | `ciclosporin_trough` | µg/L | CsA, Sandimmun, C0 | |
 | `mycophenolate_auc` | mg·h/L | MPA AUC | |
 | `everolimus_trough` | µg/L | Certican | |
@@ -97,6 +102,9 @@ Canonical names, units, and aliases. Use the canonical name in YAML frontmatter 
 | `ast` | U/L | GOT, SGOT, ASAT | |
 | `ggt` | U/L | γ-GT, Gamma-GT | |
 | `bilirubin_total` | µmol/L | Bili, Gesamtbilirubin | |
+| `ldh` | U/L | Lactat Dehydrogenase, Lactate Dehydrogenase | Affected by hemolysis |
+| `amylase` | U/L | total amylase | Includes salivary + pancreatic |
+| `pancreas_amylase` | U/L | Pankreas-Amylase, P-amylase | More specific for pancreas |
 
 ## Urine
 
@@ -150,6 +158,34 @@ Canonical names, units, and aliases. Use the canonical name in YAML frontmatter 
 | `tsh` | mIU/L | Thyrotropin | |
 | `ft4` | pmol/L | Free T4 | |
 | `ft3` | pmol/L | Free T3 | |
+
+## Cardiac & muscle
+
+| Canonical | Unit | Aliases | Notes |
+|---|---|---|---|
+| `creatine_kinase` | U/L | CK, CPK, Creatinkinase | Skeletal muscle + cardiac + smooth muscle |
+| `troponin_t_hs` | ng/L | hs-cTnT, hochsensitives Troponin T | Cardiac specific |
+| `troponin_i_hs` | ng/L | hs-cTnI | Cardiac specific |
+| `nt_probnp` | ng/L | NT-proBNP | Heart failure marker; rises with reduced eGFR |
+
+## Lipids
+
+| Canonical | Unit | Aliases | Notes |
+|---|---|---|---|
+| `cholesterol_total` | mmol/L | Cholesterin, total cholesterol | mg/dL × 0.0259 = mmol/L |
+| `cholesterol_hdl` | mmol/L | HDL-C | Higher is better |
+| `cholesterol_ldl` | mmol/L | LDL-C | Calculated (Friedewald, Sampson) or direct |
+| `cholesterol_non_hdl` | mmol/L | non-HDL-C | Total − HDL |
+| `cholesterol_hdl_ratio` |  | Chol/HDL | Total / HDL |
+| `triglycerides` | mmol/L | Triglyceride, TG | mg/dL × 0.0113 = mmol/L |
+
+## Metabolic
+
+| Canonical | Unit | Aliases | Notes |
+|---|---|---|---|
+| `glucose` | mmol/L | Blutzucker, BZ, Glucose Notfall | Fasting <5.6, 2h pp <7.8 |
+| `hba1c` | "%" | HbA1c, Hämoglobin A1c | Long-term glycemic control |
+| `hba1c_mmol` | mmol/mol | HbA1c (IFCC) | IFCC unit; HbA1c% × 10.93 − 23.5 |
 
 ## How to add a new analyte
 

@@ -40,11 +40,18 @@ if (points.length === 0) {
       datasets: [{
         label: `${analyte} (${points[0].unit})`,
         data: points.map(p => p.value),
+        borderColor: "rgb(220, 38, 38)",
+        backgroundColor: "rgb(220, 38, 38)",
+        pointRadius: 4,
+        pointHoverRadius: 6,
         borderWidth: 2,
         tension: 0.2
       }]
     },
-    options: { scales: { y: { beginAtZero: false } } }
+    options: {
+      scales: { y: { beginAtZero: false } },
+      plugins: { legend: { labels: { usePointStyle: true } } }
+    }
   };
   window.renderChart(chart, this.container);
 }
@@ -80,11 +87,18 @@ if (points.length === 0) {
       datasets: [{
         label: `eGFR (${points[0].unit})`,
         data: points.map(p => p.value),
+        borderColor: "rgb(22, 163, 74)",
+        backgroundColor: "rgb(22, 163, 74)",
+        pointRadius: 4,
+        pointHoverRadius: 6,
         borderWidth: 2,
         tension: 0.2
       }]
     },
-    options: { scales: { y: { beginAtZero: false } } }
+    options: {
+      scales: { y: { beginAtZero: false } },
+      plugins: { legend: { labels: { usePointStyle: true } } }
+    }
   };
   window.renderChart(chart, this.container);
 }
@@ -115,11 +129,18 @@ if (points.length === 0) {
       datasets: [{
         label: `Tacrolimus C0 (${points[0].unit})`,
         data: points.map(p => p.value),
+        borderColor: "rgb(147, 51, 234)",
+        backgroundColor: "rgb(147, 51, 234)",
+        pointRadius: 4,
+        pointHoverRadius: 6,
         borderWidth: 2,
         tension: 0.2
       }]
     },
-    options: { scales: { y: { beginAtZero: false } } }
+    options: {
+      scales: { y: { beginAtZero: false } },
+      plugins: { legend: { labels: { usePointStyle: true } } }
+    }
   };
   window.renderChart(chart, this.container);
 }
@@ -150,11 +171,18 @@ if (points.length === 0) {
       datasets: [{
         label: `CRP (${points[0].unit})`,
         data: points.map(p => p.value),
+        borderColor: "rgb(234, 88, 12)",
+        backgroundColor: "rgb(234, 88, 12)",
+        pointRadius: 4,
+        pointHoverRadius: 6,
         borderWidth: 2,
         tension: 0.2
       }]
     },
-    options: { scales: { y: { beginAtZero: false } } }
+    options: {
+      scales: { y: { beginAtZero: false } },
+      plugins: { legend: { labels: { usePointStyle: true } } }
+    }
   };
   window.renderChart(chart, this.container);
 }
@@ -185,11 +213,18 @@ if (points.length === 0) {
       datasets: [{
         label: `Hemoglobin (${points[0].unit})`,
         data: points.map(p => p.value),
+        borderColor: "rgb(37, 99, 235)",
+        backgroundColor: "rgb(37, 99, 235)",
+        pointRadius: 4,
+        pointHoverRadius: 6,
         borderWidth: 2,
         tension: 0.2
       }]
     },
-    options: { scales: { y: { beginAtZero: false } } }
+    options: {
+      scales: { y: { beginAtZero: false } },
+      plugins: { legend: { labels: { usePointStyle: true } } }
+    }
   };
   window.renderChart(chart, this.container);
 }
@@ -229,6 +264,10 @@ if (points.length === 0) {
   const datasets = [{
     label: `${analyte} (${points[0].unit})`,
     data: points.map(p => p.value),
+    borderColor: "rgb(37, 99, 235)",          // blue-600
+    backgroundColor: "rgb(37, 99, 235)",
+    pointRadius: 4,
+    pointHoverRadius: 6,
     borderWidth: 2,
     tension: 0.2
   }];
@@ -236,18 +275,22 @@ if (points.length === 0) {
     datasets.push({
       label: "Lower ref",
       data: points.map(() => latestRange[0]),
+      borderColor: "rgb(156, 163, 175)",      // grey-400
       borderDash: [5, 5],
       borderWidth: 1,
-      pointRadius: 0
+      pointRadius: 0,
+      fill: false
     });
   }
   if (latestRange && latestRange[1] != null) {
     datasets.push({
       label: "Upper ref",
       data: points.map(() => latestRange[1]),
+      borderColor: "rgb(156, 163, 175)",      // grey-400
       borderDash: [5, 5],
       borderWidth: 1,
-      pointRadius: 0
+      pointRadius: 0,
+      fill: false
     });
   }
   const chart = {
@@ -294,12 +337,28 @@ const sortedDates = [...allDates].sort();
 if (sortedDates.length === 0) {
   dv.paragraph(`*No data for ${analytes.join(", ")} in selected window.*`);
 } else {
-  const datasets = analytes.map(a => {
+  // Color + point-style palette — each analyte gets a distinct visual signature
+  const palette = [
+    { color: "rgb(37, 99, 235)",  pointStyle: "circle"   },  // blue
+    { color: "rgb(220, 38, 38)",  pointStyle: "rect"     },  // red, square
+    { color: "rgb(22, 163, 74)",  pointStyle: "triangle" },  // green
+    { color: "rgb(202, 138, 4)",  pointStyle: "rectRot"  },  // amber, diamond
+    { color: "rgb(147, 51, 234)", pointStyle: "cross"    },  // purple
+    { color: "rgb(15, 118, 110)", pointStyle: "star"     }   // teal
+  ];
+
+  const datasets = analytes.map((a, i) => {
+    const style = palette[i % palette.length];
     const firstUnit = Object.values(series[a])[0]?.unit ?? "";
     return {
       label: `${a} (${firstUnit})`,
       data: sortedDates.map(d => series[a][d]?.value ?? null),
       spanGaps: true,
+      borderColor: style.color,
+      backgroundColor: style.color,
+      pointStyle: style.pointStyle,
+      pointRadius: 5,
+      pointHoverRadius: 7,
       borderWidth: 2,
       tension: 0.2
     };
@@ -307,7 +366,10 @@ if (sortedDates.length === 0) {
   const chart = {
     type: "line",
     data: { labels: sortedDates, datasets },
-    options: { scales: { y: { beginAtZero: false } } }
+    options: {
+      scales: { y: { beginAtZero: false } },
+      plugins: { legend: { labels: { usePointStyle: true } } }
+    }
   };
   window.renderChart(chart, this.container);
 }
